@@ -64,7 +64,7 @@ static_assert(kCpuFlagsSize == ICpuInfo::FLAG_MAX, "kCpuFlagsSize and FLAG_MAX m
 
 
 #ifdef XMRIG_FEATURE_MSR
-constexpr size_t kMsrArraySize                                  = 6;
+constexpr size_t kMsrArraySize                                  = 7;
 static const std::array<const char *, kMsrArraySize> msrNames   = { MSR_NAMES_LIST };
 static_assert(kMsrArraySize == ICpuInfo::MSR_MOD_MAX, "kMsrArraySize and MSR_MOD_MAX mismatch");
 #endif
@@ -260,6 +260,11 @@ xmrig::BasicCpuInfo::BasicCpuInfo() :
                     }
                     break;
 
+                case 0x1a:
+                    m_arch = ARCH_ZEN5;
+                    m_msrMod = MSR_MOD_RYZEN_1AH_ZEN5;
+                    break;
+
                 default:
                     m_msrMod = MSR_MOD_NONE;
                     break;
@@ -296,7 +301,7 @@ xmrig::BasicCpuInfo::BasicCpuInfo() :
                 // Affected CPU models and stepping numbers are taken from https://www.intel.com/content/dam/support/us/en/documents/processors/mitigations-jump-conditional-code-erratum.pdf
                 m_jccErratum =
                     ((model == 0x4E) && (stepping == 0x3)) ||
-                    ((model == 0x55) && (stepping == 0x4)) ||
+                    ((model == 0x55) && ((stepping == 0x4) || (stepping == 0x7))) ||
                     ((model == 0x5E) && (stepping == 0x3)) ||
                     ((model == 0x8E) && (stepping >= 0x9) && (stepping <= 0xC)) ||
                     ((model == 0x9E) && (stepping >= 0x9) && (stepping <= 0xD)) ||
